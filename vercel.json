@@ -1,6 +1,9 @@
 {
     "buildCommand": "npm run build:client",
     "outputDirectory": "dist/spa",
+    "env": {
+        "VITE_API_URL": "https://jain-tap-backend.vercel.app/api"
+    },
     "rewrites": [
         {
             "source": "/(.*)",
