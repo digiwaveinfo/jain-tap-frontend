@@ -35,17 +35,17 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-orange-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h1 className="font-heading font-semibold text-2xl text-black">
+            <h1 className="font-heading font-semibold text-2xl text-amber-900">
               {t("admin.loginTitle", "Admin Login")}
             </h1>
-            <p className="font-body text-gray-600 mt-2">
+            <p className="font-body text-amber-600 mt-2">
               {t("admin.loginSubtitle", "Enter your credentials to access the admin panel")}
             </p>
           </div>
@@ -58,11 +58,11 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="block font-body text-sm text-gray-700">
+              <label className="block font-body text-sm text-amber-700">
                 {t("admin.username", "Username")}
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400" />
                 <Input
                   type="text"
                   value={username}
@@ -75,11 +75,11 @@ export default function AdminLogin() {
             </div>
 
             <div className="space-y-2">
-              <label className="block font-body text-sm text-gray-700">
+              <label className="block font-body text-sm text-amber-700">
                 {t("admin.password", "Password")}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400" />
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={password}
@@ -91,7 +91,7 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hover:text-amber-600"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -101,7 +101,7 @@ export default function AdminLogin() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-stone-800 hover:bg-stone-700 text-white py-6 font-heading font-semibold text-lg"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-6 font-heading font-semibold text-lg"
             >
               {loading ? t("admin.loggingIn", "Logging in...") : t("admin.login", "Login")}
             </Button>

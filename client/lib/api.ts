@@ -100,12 +100,12 @@ class ApiService {
       method: 'POST',
       body: JSON.stringify({ username, password }),
     });
-    
+
     if (response.success && response.token) {
       localStorage.setItem('adminToken', response.token);
       localStorage.setItem('adminUser', JSON.stringify(response.user));
     }
-    
+
     return response;
   }
 
@@ -166,12 +166,12 @@ class ApiService {
         if (value) params.append(key, value);
       });
     }
-    
+
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_BASE_URL}/submissions/export?${params}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
-    
+
     if (!response.ok) throw new Error('Export failed');
     return response.blob();
   }
@@ -186,6 +186,55 @@ class ApiService {
 
   async createBackup(): Promise<ApiResponse> {
     return this.request('/admin/backups', { method: 'POST' });
+  }
+
+  // Calendar
+  async getCalendarSettings(startDate: string, endDate: string): Promise<ApiResponse> {
+    return this.request(`/calendar?startDate=${startDate}&endDate=${endDate}`);
+  }
+
+  async setCalendarDateStatus(date: string, status: string): Promise<ApiResponse> {
+    return this.request('/calendar/status', {
+      method: 'POST',
+      body: JSON.stringify({ date, status })
+    });
+  }
+
+  // Anumodana
+  async getAnumodanaImages(): Promise<ApiResponse> {
+    return this.request('/anumodana');
+  }
+
+  async uploadAnumodanaImage(formData: FormData): Promise<ApiResponse> {
+    // Need special handling for FormData (no Content-Type header, browser sets it)
+    const url = `${API_BASE_URL}/anumodana`;
+    const headers = this.getAuthHeader(); // Only auth, no content-type
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers as HeadersInit,
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Upload failed');
+    return data;
+  }
+
+  async deleteAnumodanaImage(id: string): Promise<ApiResponse> {
+    return this.request(`/anumodana/${id}`, { method: 'DELETE' });
+  }
+
+  // System Settings
+  async getSystemSettings(): Promise<ApiResponse> {
+    return this.request('/admin/settings');
+  }
+
+  async updateSystemSettings(settings: { maxBookingsPerDay?: number, maxBookingsPerMonth?: number }): Promise<ApiResponse> {
+    return this.request('/admin/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings)
+    });
   }
 }
 

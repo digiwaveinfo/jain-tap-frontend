@@ -40,13 +40,13 @@ export default function Navigation() {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "text-black hover:text-gray-700 transition-colors relative pb-3",
+                  "text-amber-900 hover:text-amber-700 transition-colors relative pb-3",
                   isActive(item.path) ? "font-medium" : "font-normal"
                 )}
               >
                 {item.label}
                 {isActive(item.path) && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-black rounded-full"></span>
+                  <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-orange-600 rounded-full"></span>
                 )}
               </Link>
             ))}
@@ -55,11 +55,11 @@ export default function Navigation() {
       </nav>
 
       {/* Mobile Navigation Header */}
-      <nav className="lg:hidden bg-stone-100 py-4 px-4 relative z-50">
+      <nav className="lg:hidden bg-orange-50 py-4 px-4 relative z-50">
         <div className="flex justify-end items-center">
           <button
             onClick={() => setIsMenuOpen(true)}
-            className="p-2 text-gray-800"
+            className="p-2 text-amber-800"
             aria-label="Open menu"
           >
             <Menu className="w-6 h-6" />
@@ -71,7 +71,7 @@ export default function Navigation() {
       {isMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-[100]">
           <div 
-            className="absolute inset-0 bg-black/30"
+            className="absolute inset-0 bg-orange-600/30"
             onClick={() => setIsMenuOpen(false)}
           />
           
@@ -79,7 +79,7 @@ export default function Navigation() {
             <div className="flex justify-end p-4">
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="p-2 text-gray-800"
+                className="p-2 text-amber-800"
                 aria-label="Close menu"
               >
                 <X className="w-6 h-6" />
@@ -93,27 +93,27 @@ export default function Navigation() {
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={cn(
-                    "text-black hover:text-gray-700 transition-colors relative",
+                    "text-amber-900 hover:text-amber-700 transition-colors relative",
                     isActive(item.path) ? "font-semibold" : "font-normal"
                   )}
                 >
                   {item.label}
                   {isActive(item.path) && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-black"></span>
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-600"></span>
                   )}
                 </Link>
               ))}
             </div>
 
-            <div className="mx-7 border-t border-black my-6"></div>
+            <div className="mx-7 border-t border-amber-700 my-6"></div>
 
             {/* Language Switcher */}
             <div className="flex justify-center items-center gap-3 pb-8">
               <button 
                 onClick={() => changeLanguage('gu')}
                 className={cn(
-                  "w-20 h-14 border-2 border-black rounded-lg font-['Abhaya_Libre'] font-semibold text-2xl transition-colors",
-                  currentLang === 'gu' ? "bg-stone-800 text-stone-100" : "bg-white text-black hover:bg-gray-50"
+                  "w-20 h-14 border-2 border-amber-700 rounded-lg font-['Abhaya_Libre'] font-semibold text-2xl transition-colors",
+                  currentLang === 'gu' ? "bg-orange-600 text-white" : "bg-white text-amber-900 hover:bg-amber-50"
                 )}
               >
                 {t("language.gu")}
@@ -121,8 +121,8 @@ export default function Navigation() {
               <button 
                 onClick={() => changeLanguage('en')}
                 className={cn(
-                  "w-20 h-14 border-2 border-black rounded-lg font-['Sansita'] text-2xl transition-colors",
-                  currentLang === 'en' ? "bg-stone-800 text-stone-100" : "bg-white text-black hover:bg-gray-50"
+                  "w-20 h-14 border-2 border-amber-700 rounded-lg font-['Sansita'] text-2xl transition-colors",
+                  currentLang === 'en' ? "bg-orange-600 text-white" : "bg-white text-amber-900 hover:bg-amber-50"
                 )}
               >
                 {t("language.en")}
@@ -130,8 +130,8 @@ export default function Navigation() {
               <button 
                 onClick={() => changeLanguage('hi')}
                 className={cn(
-                  "w-20 h-14 border-2 border-black rounded-lg font-['Abhaya_Libre'] font-semibold text-2xl transition-colors",
-                  currentLang === 'hi' ? "bg-stone-800 text-stone-100" : "bg-white text-black hover:bg-gray-50"
+                  "w-20 h-14 border-2 border-amber-700 rounded-lg font-['Abhaya_Libre'] font-semibold text-2xl transition-colors",
+                  currentLang === 'hi' ? "bg-orange-600 text-white" : "bg-white text-amber-900 hover:bg-amber-50"
                 )}
               >
                 {t("language.hi")}

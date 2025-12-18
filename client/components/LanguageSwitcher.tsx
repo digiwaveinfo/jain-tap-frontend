@@ -16,8 +16,8 @@ export default function LanguageSwitcher() {
         <button 
           onClick={() => changeLanguage('gu')}
           className={cn(
-            "border-2 border-black rounded-l-lg px-3 py-4 font-heading font-semibold text-2xl transition-colors",
-            currentLang === 'gu' ? "bg-stone-800 text-stone-100" : "bg-white text-black hover:bg-gray-50"
+            "border-2 border-amber-700 rounded-l-lg px-3 py-4 font-heading font-semibold text-2xl transition-colors",
+            currentLang === 'gu' ? "bg-orange-600 text-white" : "bg-white text-amber-900 hover:bg-amber-50"
           )}
         >
           {t("language.gu")}
@@ -25,8 +25,8 @@ export default function LanguageSwitcher() {
         <button 
           onClick={() => changeLanguage('en')}
           className={cn(
-            "border-2 border-black rounded-l-lg px-3 py-4 font-['Sansita'] text-2xl transition-colors",
-            currentLang === 'en' ? "bg-stone-800 text-stone-100" : "bg-white text-black hover:bg-gray-50"
+            "border-2 border-amber-700 rounded-l-lg px-3 py-4 font-['Sansita'] text-2xl transition-colors",
+            currentLang === 'en' ? "bg-orange-600 text-white" : "bg-white text-amber-900 hover:bg-amber-50"
           )}
         >
           {t("language.en")}
@@ -34,8 +34,8 @@ export default function LanguageSwitcher() {
         <button 
           onClick={() => changeLanguage('hi')}
           className={cn(
-            "border-2 border-black rounded-l-lg px-3 py-4 font-heading font-semibold text-2xl transition-colors",
-            currentLang === 'hi' ? "bg-stone-800 text-stone-100" : "bg-white text-black hover:bg-gray-50"
+            "border-2 border-amber-700 rounded-l-lg px-3 py-4 font-heading font-semibold text-2xl transition-colors",
+            currentLang === 'hi' ? "bg-orange-600 text-white" : "bg-white text-amber-900 hover:bg-amber-50"
           )}
         >
           {t("language.hi")}

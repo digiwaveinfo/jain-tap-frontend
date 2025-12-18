@@ -11,8 +11,8 @@ interface PageLayoutProps {
 export default function PageLayout({ children }: PageLayoutProps) {
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Top Background Section - stone-100/80 */}
-      <div className="absolute top-0 left-0 w-full h-[400px] sm:h-[500px] lg:h-[700px] bg-stone-100/80 pointer-events-none" />
+      {/* Top Background Section - orange-50/80 */}
+      <div className="absolute top-0 left-0 w-full h-[400px] sm:h-[500px] lg:h-[700px] bg-orange-50/80 pointer-events-none" />
 
       {/* Large Decorative Image - Top Left Corner (75% visible) */}
       <img

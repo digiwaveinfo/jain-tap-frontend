@@ -10,11 +10,11 @@ export default function Vidhinav() {
   return (
     <PageLayout>
       <section className="max-w-4xl mx-auto px-4 lg:px-8 py-12 lg:py-20 relative z-10">
-        <h1 className="text-center font-heading font-semibold text-3xl sm:text-4xl lg:text-6xl text-black mb-8 lg:mb-12">
+        <h1 className="text-center font-heading font-semibold text-3xl sm:text-4xl lg:text-6xl text-amber-900 mb-8 lg:mb-12">
           {t("vidhinav.title")}
         </h1>
         
-        <div className="space-y-6 lg:space-y-8 font-body text-lg lg:text-2xl text-black leading-relaxed lg:leading-9 text-center">
+        <div className="space-y-6 lg:space-y-8 font-body text-lg lg:text-2xl text-amber-900 leading-relaxed lg:leading-9 text-center">
           <p className="font-semibold">{t("vidhinav.line1")}</p>
           <p>{t("vidhinav.line2")}</p>
           <p>{t("vidhinav.line3")}</p>
@@ -38,7 +38,7 @@ export default function Vidhinav() {
           <Link to="/anumodana">
             <Button 
               variant="outline"
-              className="bg-white hover:bg-gray-50 text-black border-2 border-black rounded-2xl px-6 lg:px-8 py-5 lg:py-7 text-lg lg:text-[22px] font-heading font-semibold flex items-center gap-2 w-[180px] justify-center"
+              className="bg-white hover:bg-amber-50 text-amber-900 border-2 border-amber-700 rounded-2xl px-6 lg:px-8 py-5 lg:py-7 text-lg lg:text-[22px] font-heading font-semibold flex items-center gap-2 w-[180px] justify-center"
             >
               <ArrowLeft className="w-5 h-5 lg:w-6 lg:h-6" />
               {t("buttons.back")}

@@ -118,8 +118,29 @@
     "slide3Desc": "That such accidents never happen."
   },
   "calendar": {
-    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
     "close": "Close"
   },
   "buttons": {
@@ -175,6 +196,36 @@
     "pending": "Pending",
     "confirmed": "Confirmed",
     "rejected": "Rejected",
-    "delete": "Delete"
+    "delete": "Delete",
+    "dashboard": "Dashboard",
+    "calendar": "Availability",
+    "gallery": "Gallery",
+    "settings": "Settings",
+    "settingsTitle": "Booking Configuration",
+    "maxBookingsPerDay": "Max Bookings Per Day",
+    "maxBookingsPerDayDesc": "Maximum number of approved bookings allowed for a single date.",
+    "maxBookingsPerMonth": "Max Bookings Per Month (Per User)",
+    "maxBookingsPerMonthDesc": "Maximum number of bookings a single user (mobile number) can make in a month.",
+    "saveChanges": "Save Changes",
+    "saveSuccess": "Settings saved successfully",
+    "saveFailed": "Failed to save settings",
+    "uploadImage": "Upload Image",
+    "imageFile": "Image File",
+    "date": "Date",
+    "description": "Description",
+    "optional": "Optional",
+    "upload": "Upload",
+    "uploadSuccess": "Image uploaded successfully",
+    "uploadFailed": "Upload failed",
+    "deleteImageConfirm": "Delete this image?",
+    "manageAvailability": "Manage Availability",
+    "clickToToggle": "Click to toggle. Drag to select range.",
+    "rangeSelection": "Range Selection",
+    "fromDate": "From Date",
+    "toDate": "To Date",
+    "applyRange": "Apply Range",
+    "open": "Open",
+    "closed": "Closed",
+    "comingSoon": "Coming Soon"
   }
 }

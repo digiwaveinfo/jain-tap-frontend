@@ -10,15 +10,15 @@ export default function Index() {
   return (
     <PageLayout>
       <section className="max-w-5xl mx-auto px-4 lg:px-8 py-12 lg:py-20 relative z-10">
-        <h1 className="text-center font-heading font-semibold text-4xl lg:text-6xl text-black mb-6 lg:mb-8">
+        <h1 className="text-center font-heading font-semibold text-4xl lg:text-6xl text-amber-900 mb-6 lg:mb-8">
           {t("home.title")}
         </h1>
         
-        <p className="text-center font-body font-bold text-xl lg:text-2xl text-black mb-6 lg:mb-8">
+        <p className="text-center font-body font-bold text-xl lg:text-2xl text-amber-900 mb-6 lg:mb-8">
           {t("home.subtitle")}
         </p>
 
-        <div className="space-y-6 font-body text-lg lg:text-2xl text-black leading-relaxed">
+        <div className="space-y-6 font-body text-lg lg:text-2xl text-amber-900 leading-relaxed">
           <p>{t("home.intro")}</p>
 
           <div className="space-y-4 lg:space-y-6 leading-[1.5]">
@@ -48,7 +48,7 @@ export default function Index() {
         <div className="flex justify-center mt-12 lg:mt-16">
           <Link to="/tapp-ni-vidhi">
             <Button 
-              className="bg-black hover:bg-gray-800 text-white rounded-2xl px-6 lg:px-8 py-5 lg:py-7 text-lg lg:text-[22px] font-heading font-semibold flex items-center gap-2"
+              className="bg-orange-600 hover:bg-orange-700 text-white rounded-2xl px-6 lg:px-8 py-5 lg:py-7 text-lg lg:text-[22px] font-heading font-semibold flex items-center gap-2"
             >
               {t("buttons.next")}
               <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6" />
