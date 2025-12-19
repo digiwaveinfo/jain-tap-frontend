@@ -52,9 +52,8 @@ export default function HeroCarousel() {
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-500 ${index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
           >
             <img
               src={slide.desktopImage}
@@ -69,8 +68,8 @@ export default function HeroCarousel() {
           </div>
         ))}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/60 via-transparent to-transparent pointer-events-none" />
-        
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/60 via-transparent to-transparent pointer-events-none" />
+
         <div className="absolute inset-0 flex flex-col justify-end items-center pb-12 lg:pb-20 px-4">
           <div className="text-center max-w-4xl">
             <h2 className="text-white font-heading font-semibold text-xl sm:text-2xl lg:text-[34px] mb-3 lg:mb-4">
@@ -86,11 +85,10 @@ export default function HeroCarousel() {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-2 h-2 lg:w-3 lg:h-3 rounded-full transition-all ${
-                  index === currentSlide 
-                    ? "bg-white w-6 lg:w-8" 
+                className={`w-2 h-2 lg:w-3 lg:h-3 rounded-full transition-all ${index === currentSlide
+                    ? "bg-white w-6 lg:w-8"
                     : "bg-white/50 hover:bg-white/70"
-                }`}
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
