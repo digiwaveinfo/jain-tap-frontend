@@ -41,7 +41,6 @@ export default function Booking() {
     whatsappMobile: "",
     schoolName: "",
     city: "",
-    email: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -204,7 +203,6 @@ export default function Booking() {
           whatsappNumber: formData.whatsappMobile,
           ayambilShalaName: formData.schoolName,
           city: formData.city,
-          email: formData.email || undefined,
           bookingDate: convertToISODate(date),
         });
 
@@ -215,7 +213,7 @@ export default function Booking() {
       }
 
       setSubmitSuccess(true);
-      setFormData({ name: "", upiMobile: "", whatsappMobile: "", schoolName: "", city: "", email: "" });
+      setFormData({ name: "", upiMobile: "", whatsappMobile: "", schoolName: "", city: "" });
       setSelectedDates([]);
       // Navigate to Anumodana page after 2 seconds
       setTimeout(() => {
@@ -516,12 +514,7 @@ export default function Booking() {
                 <Input type="text" name="city" value={formData.city} onChange={handleChange} required className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
               </div>
 
-              <div className="space-y-2">
-                <label className="block font-body text-lg lg:text-2xl text-amber-900">
-                  {t("booking.emailLabel", "ઈમેલ")} <span className="text-amber-500">({t("booking.optional", "વૈકલ્પિક")})</span>
-                </label>
-                <Input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
-              </div>
+
             </div>
 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 lg:gap-8 mt-12 lg:mt-16">

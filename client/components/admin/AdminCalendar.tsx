@@ -281,10 +281,10 @@ export function AdminCalendar({ showToast }: AdminCalendarProps) {
                                             onMouseEnter={() => handleDateHover(dateStr)}
                                             className={cn(
                                                 "h-14 rounded-md border flex flex-col items-center justify-center transition-colors relative cursor-pointer",
-                                                isPast ? "bg-orange-50 text-amber-300 cursor-not-allowed" :
+                                                isPast ? "bg-gray-100 text-gray-300 cursor-not-allowed" :
                                                     inSelection ? "bg-blue-100 border-blue-500 ring-2 ring-blue-300 z-10" :
                                                         isOpen ? "bg-green-100 border-green-200 text-green-700 hover:bg-green-200" :
-                                                            "bg-amber-50 border-amber-200 text-amber-400 hover:bg-orange-50"
+                                                            "bg-gray-50 border-gray-200 text-gray-400 hover:bg-gray-100"
                                             )}
                                         >
                                             <span className="text-sm font-bold">{day}</span>

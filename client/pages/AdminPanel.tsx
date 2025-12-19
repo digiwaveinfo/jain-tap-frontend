@@ -213,7 +213,7 @@ export default function AdminPanel() {
       )}
 
       {/* Header */}
-      <header className="bg-orange-600 text-white px-4 sm:px-6 py-3 sm:py-4">
+      <header className="bg-slate-900 text-white px-4 sm:px-6 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
           <div>
             <h1 className="font-heading font-semibold text-lg sm:text-xl">
