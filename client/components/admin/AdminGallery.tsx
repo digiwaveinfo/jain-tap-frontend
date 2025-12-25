@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Trash2, Upload, Loader2, Plus } from "lucide-react";
+import Swal from "sweetalert2";
 
 interface GalleryImage {
     id: string;
@@ -80,7 +81,18 @@ export function AdminGallery({ showToast }: AdminGalleryProps) {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm(t("admin.deleteImageConfirm"))) return;
+        const result = await Swal.fire({
+            title: t("admin.deleteImageConfirm"),
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: t("admin.delete", "Delete"),
+            cancelButtonText: t("admin.cancel", "Cancel")
+        });
+        
+        if (!result.isConfirmed) return;
+        
         try {
             await api.deleteAnumodanaImage(id);
             setImages(images.filter(img => img.id !== id));

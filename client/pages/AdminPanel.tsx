@@ -13,6 +13,7 @@ import {
 import { AdminCalendar } from "@/components/admin/AdminCalendar";
 import { AdminGallery } from "@/components/admin/AdminGallery";
 import { AdminSettings } from "@/components/admin/AdminSettings";
+import Swal from "sweetalert2";
 
 // Toast notification component
 function Toast({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) {
@@ -131,7 +132,18 @@ export default function AdminPanel() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(t("admin.confirmDelete", "Are you sure you want to delete this submission?"))) return;
+    const result = await Swal.fire({
+      title: t("admin.confirmDelete", "Are you sure you want to delete this submission?"),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: t("admin.delete", "Delete"),
+      cancelButtonText: t("admin.cancel", "Cancel")
+    });
+    
+    if (!result.isConfirmed) return;
+    
     try {
       await api.deleteSubmission(id);
       fetchSubmissions();

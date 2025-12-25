@@ -45,6 +45,7 @@ export default function Booking() {
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [showCalendar, setShowCalendar] = useState(false);
   const selectedDateObj = initialDates.length > 0
@@ -186,13 +187,43 @@ export default function Booking() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous errors
+    setFieldErrors({});
+    setSubmitError("");
+    
+    // Validate fields
+    const errors: Record<string, string> = {};
+    
     if (selectedDates.length === 0) {
-      setSubmitError(t("booking.alertSelectDate"));
+      errors.date = t("booking.alertSelectDate");
+    }
+    if (!formData.name.trim()) {
+      errors.name = t("booking.nameRequired", "Name is required");
+    }
+    if (!formData.upiMobile.trim()) {
+      errors.upiMobile = t("booking.upiRequired", "UPI mobile number is required");
+    } else if (!/^\d{10}$/.test(formData.upiMobile.trim())) {
+      errors.upiMobile = t("booking.invalidMobile", "Please enter a valid 10-digit mobile number");
+    }
+    if (!formData.whatsappMobile.trim()) {
+      errors.whatsappMobile = t("booking.whatsappRequired", "WhatsApp number is required");
+    } else if (!/^\d{10}$/.test(formData.whatsappMobile.trim())) {
+      errors.whatsappMobile = t("booking.invalidMobile", "Please enter a valid 10-digit mobile number");
+    }
+    if (!formData.schoolName.trim()) {
+      errors.schoolName = t("booking.schoolRequired", "Ayambil Shala name is required");
+    }
+    if (!formData.city.trim()) {
+      errors.city = t("booking.cityRequired", "City is required");
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
     setSubmitting(true);
-    setSubmitError("");
 
     try {
       // Submit each date as a separate booking (backend expects single date)
@@ -303,7 +334,10 @@ export default function Booking() {
 
                 <div
                   onClick={() => setShowCalendar(!showCalendar)}
-                  className="w-full border-b-2 border-amber-700 py-3 font-body text-lg lg:text-xl cursor-pointer"
+                  className={cn(
+                    "w-full border-b-2 py-3 font-body text-lg lg:text-xl cursor-pointer",
+                    fieldErrors.date ? "border-red-500" : "border-amber-700"
+                  )}
                 >
                   {selectedDates.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
@@ -328,6 +362,9 @@ export default function Booking() {
                     </div>
                   )}
                 </div>
+                {fieldErrors.date && (
+                  <p className="text-red-500 text-sm font-body mt-1">{fieldErrors.date}</p>
+                )}
 
                 <p className="text-sm text-amber-500 font-body">
                   {t("booking.selectedCount")} {selectedCountDisplay} / {maxDatesDisplay} {t("booking.dates")}
@@ -483,35 +520,50 @@ export default function Booking() {
                 <label className="block font-body text-lg lg:text-2xl text-amber-900">
                   {t("booking.nameLabel")} <span className="text-amber-900">{t("booking.required")}</span>
                 </label>
-                <Input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
+                <Input type="text" name="name" value={formData.name} onChange={handleChange} className={cn("w-full border-b-2 border-t-0 border-l-0 border-r-0 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0", fieldErrors.name ? "border-red-500" : "border-amber-700")} />
+                {fieldErrors.name && (
+                  <p className="text-red-500 text-sm font-body mt-1">{fieldErrors.name}</p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <label className="block font-body text-lg lg:text-2xl text-amber-900">
                   {t("booking.upiLabel")} <span className="text-amber-900">{t("booking.required")}</span>
                 </label>
-                <Input type="tel" name="upiMobile" value={formData.upiMobile} onChange={handleChange} required className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
+                <Input type="tel" name="upiMobile" value={formData.upiMobile} onChange={handleChange} className={cn("w-full border-b-2 border-t-0 border-l-0 border-r-0 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0", fieldErrors.upiMobile ? "border-red-500" : "border-amber-700")} />
+                {fieldErrors.upiMobile && (
+                  <p className="text-red-500 text-sm font-body mt-1">{fieldErrors.upiMobile}</p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <label className="block font-body text-lg lg:text-2xl text-amber-900">
                   {t("booking.whatsappLabel")} <span className="text-amber-900">{t("booking.required")}</span>
                 </label>
-                <Input type="tel" name="whatsappMobile" value={formData.whatsappMobile} onChange={handleChange} required className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
+                <Input type="tel" name="whatsappMobile" value={formData.whatsappMobile} onChange={handleChange} className={cn("w-full border-b-2 border-t-0 border-l-0 border-r-0 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0", fieldErrors.whatsappMobile ? "border-red-500" : "border-amber-700")} />
+                {fieldErrors.whatsappMobile && (
+                  <p className="text-red-500 text-sm font-body mt-1">{fieldErrors.whatsappMobile}</p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <label className="block font-body text-lg lg:text-2xl text-amber-900">
                   {t("booking.schoolLabel")} <span className="text-amber-900">{t("booking.required")}</span>
                 </label>
-                <Input type="text" name="schoolName" value={formData.schoolName} onChange={handleChange} required className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
+                <Input type="text" name="schoolName" value={formData.schoolName} onChange={handleChange} className={cn("w-full border-b-2 border-t-0 border-l-0 border-r-0 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0", fieldErrors.schoolName ? "border-red-500" : "border-amber-700")} />
+                {fieldErrors.schoolName && (
+                  <p className="text-red-500 text-sm font-body mt-1">{fieldErrors.schoolName}</p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <label className="block font-body text-lg lg:text-2xl text-amber-900">
                   {t("booking.cityLabel")} <span className="text-amber-900">{t("booking.required")}</span>
                 </label>
-                <Input type="text" name="city" value={formData.city} onChange={handleChange} required className="w-full border-b-2 border-t-0 border-l-0 border-r-0 border-amber-700 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0" />
+                <Input type="text" name="city" value={formData.city} onChange={handleChange} className={cn("w-full border-b-2 border-t-0 border-l-0 border-r-0 rounded-none px-0 font-body text-lg lg:text-xl focus-visible:ring-0", fieldErrors.city ? "border-red-500" : "border-amber-700")} />
+                {fieldErrors.city && (
+                  <p className="text-red-500 text-sm font-body mt-1">{fieldErrors.city}</p>
+                )}
               </div>
 
 
