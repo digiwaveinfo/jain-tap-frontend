@@ -55,11 +55,11 @@ export default function Anumodana() {
 
       rows.push(
         <div key={i} className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6">
-          <div className={`md:col-span-${isEvenRow ? '7' : '5'}`}>
+          <div className={isEvenRow ? 'md:col-span-7' : 'md:col-span-5'}>
             <GalleryCard image={img1} />
           </div>
           {img2 && (
-            <div className={`md:col-span-${isEvenRow ? '5' : '7'}`}>
+            <div className={isEvenRow ? 'md:col-span-5' : 'md:col-span-7'}>
               <GalleryCard image={img2} />
             </div>
           )}
