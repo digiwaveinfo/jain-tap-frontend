@@ -77,7 +77,17 @@
     "submitError": "सबमिट करने में विफल। कृपया पुनः प्रयास करें।",
     "submitting": "सबमिट हो रहा है...",
     "emailLabel": "ईमेल",
-    "optional": "वैकल्पिक"
+    "optional": "वैकल्पिक",
+    "validation": {
+      "nameRequired": "नाम आवश्यक है",
+      "upiRequired": "UPI नंबर आवश्यक है",
+      "upiInvalid": "मान्य 10 अंकों का UPI नंबर दर्ज करें",
+      "whatsappRequired": "WhatsApp नंबर आवश्यक है",
+      "whatsappInvalid": "मान्य 10 अंकों का WhatsApp नंबर दर्ज करें",
+      "schoolRequired": "आयंबिल शाला का नाम आवश्यक है",
+      "cityRequired": "शहर आवश्यक है",
+      "dateRequired": "कृपया कम से कम एक तारीख चुनें"
+    }
   },
   "availableDates": {
     "title": "उपलब्ध तारीखें देखें",

@@ -77,7 +77,17 @@
     "submitError": "સબમિટ કરવામાં નિષ્ફળ. કૃપા કરીને ફરી પ્રયાસ કરો.",
     "submitting": "સબમિટ થઈ રહ્યું છે...",
     "emailLabel": "ઈમેલ",
-    "optional": "વૈકલ્પિક"
+    "optional": "વૈકલ્પિક",
+    "validation": {
+      "nameRequired": "નામ જરૂરી છે",
+      "upiRequired": "UPI નંબર જરૂરી છે",
+      "upiInvalid": "માન્ય 10 અંકનો UPI નંબર દાખલ કરો",
+      "whatsappRequired": "WhatsApp નંબર જરૂરી છે",
+      "whatsappInvalid": "માન્ય 10 અંકનો WhatsApp નંબર દાખલ કરો",
+      "schoolRequired": "આયંબિલ શાળા નામ જરૂરી છે",
+      "cityRequired": "શહેર જરૂરી છે",
+      "dateRequired": "કૃપા કરીને ઓછામાં ઓછી એક તારીખ પસંદ કરો"
+    }
   },
   "availableDates": {
     "title": "ઉપલબ્ધ તારીખો જુઓ",

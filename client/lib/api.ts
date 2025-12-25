@@ -79,11 +79,26 @@ class ApiService {
   }
 
   // Public endpoints
-  async submitBooking(data: SubmissionData): Promise<ApiResponse> {
-    return this.request('/submissions', {
+  async submitBooking(data: SubmissionData): Promise<ApiResponse & { errors?: Array<{ field: string; message: string }> }> {
+    const url = `${API_BASE_URL}/submissions`;
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    const response = await fetch(url, {
       method: 'POST',
+      headers,
       body: JSON.stringify(data),
     });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      // Return the full response including errors array for field-level validation
+      return responseData;
+    }
+
+    return responseData;
   }
 
   async getBookingCounts(startDate: string, endDate: string): Promise<ApiResponse<Record<string, number>>> {

@@ -192,30 +192,30 @@ export default function Booking() {
     setFieldErrors({});
     setSubmitError("");
     
-    // Validate fields
+    // Frontend validation using translations
     const errors: Record<string, string> = {};
     
     if (selectedDates.length === 0) {
-      errors.date = t("booking.alertSelectDate");
+      errors.date = t("booking.validation.dateRequired");
     }
     if (!formData.name.trim()) {
-      errors.name = t("booking.nameRequired", "Name is required");
+      errors.name = t("booking.validation.nameRequired");
     }
     if (!formData.upiMobile.trim()) {
-      errors.upiMobile = t("booking.upiRequired", "UPI mobile number is required");
+      errors.upiMobile = t("booking.validation.upiRequired");
     } else if (!/^\d{10}$/.test(formData.upiMobile.trim())) {
-      errors.upiMobile = t("booking.invalidMobile", "Please enter a valid 10-digit mobile number");
+      errors.upiMobile = t("booking.validation.upiInvalid");
     }
     if (!formData.whatsappMobile.trim()) {
-      errors.whatsappMobile = t("booking.whatsappRequired", "WhatsApp number is required");
+      errors.whatsappMobile = t("booking.validation.whatsappRequired");
     } else if (!/^\d{10}$/.test(formData.whatsappMobile.trim())) {
-      errors.whatsappMobile = t("booking.invalidMobile", "Please enter a valid 10-digit mobile number");
+      errors.whatsappMobile = t("booking.validation.whatsappInvalid");
     }
     if (!formData.schoolName.trim()) {
-      errors.schoolName = t("booking.schoolRequired", "Ayambil Shala name is required");
+      errors.schoolName = t("booking.validation.schoolRequired");
     }
     if (!formData.city.trim()) {
-      errors.city = t("booking.cityRequired", "City is required");
+      errors.city = t("booking.validation.cityRequired");
     }
     
     if (Object.keys(errors).length > 0) {
@@ -238,7 +238,43 @@ export default function Booking() {
         });
 
         if (!response.success) {
-          setSubmitError(response.message || t("booking.submitError"));
+          // Check if response has field-specific errors
+          const apiErrors = (response as any).errors;
+          if (apiErrors && Array.isArray(apiErrors)) {
+            const fieldErrs: Record<string, string> = {};
+            apiErrors.forEach((err: { field: string; message: string }) => {
+              // Map backend field names to frontend field names and use translations
+              const fieldMap: Record<string, string> = {
+                'upiNumber': 'upiMobile',
+                'whatsappNumber': 'whatsappMobile',
+                'ayambilShalaName': 'schoolName',
+                'bookingDate': 'date',
+                'name': 'name',
+                'city': 'city'
+              };
+              const frontendField = fieldMap[err.field] || err.field;
+              
+              // Map to translation keys based on field and error type
+              if (frontendField === 'upiMobile') {
+                fieldErrs[frontendField] = err.message.includes('10') ? t("booking.validation.upiInvalid") : t("booking.validation.upiRequired");
+              } else if (frontendField === 'whatsappMobile') {
+                fieldErrs[frontendField] = err.message.includes('10') ? t("booking.validation.whatsappInvalid") : t("booking.validation.whatsappRequired");
+              } else if (frontendField === 'name') {
+                fieldErrs[frontendField] = t("booking.validation.nameRequired");
+              } else if (frontendField === 'schoolName') {
+                fieldErrs[frontendField] = t("booking.validation.schoolRequired");
+              } else if (frontendField === 'city') {
+                fieldErrs[frontendField] = t("booking.validation.cityRequired");
+              } else if (frontendField === 'date') {
+                fieldErrs[frontendField] = t("booking.validation.dateRequired");
+              } else {
+                fieldErrs[frontendField] = err.message;
+              }
+            });
+            setFieldErrors(fieldErrs);
+          } else {
+            setSubmitError(response.message || t("booking.submitError"));
+          }
           return;
         }
       }
@@ -251,7 +287,25 @@ export default function Booking() {
         navigate('/anumodana');
       }, 2000);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : t("booking.submitError"));
+      // Try to parse backend validation errors from the error message
+      const errorMessage = error instanceof Error ? error.message : t("booking.submitError");
+      
+      // Check if it's a field-specific error based on message content and use translations
+      if (errorMessage.includes('UPI') || errorMessage.includes('યુપીઆઈ')) {
+        setFieldErrors({ upiMobile: errorMessage.includes('10') ? t("booking.validation.upiInvalid") : t("booking.validation.upiRequired") });
+      } else if (errorMessage.includes('WhatsApp') || errorMessage.includes('વોટ્સએપ')) {
+        setFieldErrors({ whatsappMobile: errorMessage.includes('10') ? t("booking.validation.whatsappInvalid") : t("booking.validation.whatsappRequired") });
+      } else if (errorMessage.includes('નામ') || errorMessage.includes('Name') || errorMessage.includes('नाम')) {
+        setFieldErrors({ name: t("booking.validation.nameRequired") });
+      } else if (errorMessage.includes('શાળા') || errorMessage.includes('Shala') || errorMessage.includes('शाला')) {
+        setFieldErrors({ schoolName: t("booking.validation.schoolRequired") });
+      } else if (errorMessage.includes('શહેર') || errorMessage.includes('City') || errorMessage.includes('शहर')) {
+        setFieldErrors({ city: t("booking.validation.cityRequired") });
+      } else if (errorMessage.includes('તારીખ') || errorMessage.includes('date') || errorMessage.includes('तारीख')) {
+        setFieldErrors({ date: t("booking.validation.dateRequired") });
+      } else {
+        setSubmitError(errorMessage);
+      }
     } finally {
       setSubmitting(false);
     }
