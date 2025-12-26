@@ -33,6 +33,7 @@ export default function AvailableDates() {
   // Dynamic data
   const [openDates, setOpenDates] = useState<string[]>([]);
   const [fullDates, setFullDates] = useState<string[]>([]);
+  const [bookingCounts, setBookingCounts] = useState<Record<string, number>>({});
   const [maxBookings, setMaxBookings] = useState(3);
   const maxDates = 3;
 
@@ -62,6 +63,7 @@ export default function AvailableDates() {
           const counts = data.bookingCounts || {};
           const max = data.maxBookingsPerDay || 3;
           setMaxBookings(max);
+          setBookingCounts(counts);
           setFullDates(Object.keys(counts).filter(d => counts[d] >= max));
         }
       } catch (error) {
@@ -116,6 +118,12 @@ export default function AvailableDates() {
   };
 
   const isSelected = (day: number) => selectedDates.includes(formatDate(day));
+
+  const getRemainingCount = (day: number) => {
+    const dateStr = convertToIsoFromParts(day, selectedMonth, selectedYear);
+    const booked = bookingCounts[dateStr] || 0;
+    return maxBookings - booked;
+  };
 
   const handleDateClick = (day: number | null) => {
     if (!day) return;
@@ -248,6 +256,7 @@ export default function AvailableDates() {
               const open = isOpen(day);
               const full = isFull(day);
               const selected = isSelected(day);
+              const remaining = getRemainingCount(day);
               const past = new Date(selectedYear, selectedMonth, day) < new Date(new Date().setHours(0, 0, 0, 0));
 
               // Determine status and style
@@ -285,7 +294,7 @@ export default function AvailableDates() {
                 btnClass = "bg-green-50 border-green-500 hover:bg-green-100 cursor-pointer";
                 textClass = "text-green-700";
                 subTextClass = "text-green-600";
-                statusText = t("availableDates.isAvailable", "Available");
+                statusText = `${remaining} ${t("booking.remaining")}`;
               }
 
               return (

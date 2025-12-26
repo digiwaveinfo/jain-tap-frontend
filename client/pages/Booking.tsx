@@ -565,7 +565,7 @@ export default function Booking() {
                           >
                             <span className="font-semibold">{String(day).padStart(2, '0')}</span>
                             {open && !full && !past && remaining < maxBookingsPerDay && (
-                              <span className="text-[9px] leading-none">{remaining} left</span>
+                              <span className="text-[9px] leading-none">{remaining} {t("booking.remaining")}</span>
                             )}
                           </button>
                         )

@@ -79,6 +79,12 @@ export default function AdminPanel() {
       }
     } catch (error) {
       console.error("Failed to fetch submissions:", error);
+      // Auth errors are handled in api.request, will redirect automatically
+      if (error instanceof Error && error.message.includes('Authentication')) {
+        // Already redirected by api service
+        return;
+      }
+      showToast(t("admin.loadingFailed", "Failed to load data"), "error");
     } finally {
       setLoading(false);
     }
@@ -92,6 +98,7 @@ export default function AdminPanel() {
       }
     } catch (error) {
       console.error("Failed to fetch stats:", error);
+      // Auth errors are handled in api.request, will redirect automatically
     }
   };
 
@@ -146,8 +153,19 @@ export default function AdminPanel() {
     
     try {
       await api.deleteSubmission(id);
-      fetchSubmissions();
-      fetchStats();
+      
+      // Update state directly instead of refetching
+      setSubmissions(prev => prev.filter(sub => sub.id !== id));
+      setTotal(prev => prev - 1);
+      
+      // Update stats if available
+      if (stats) {
+        setStats({
+          ...stats,
+          total: ((stats as any).total || 0) - 1
+        });
+      }
+      
       showToast(t("admin.deleteSuccess", "Deleted successfully"), "success");
     } catch (error) {
       console.error("Delete failed:", error);
@@ -158,8 +176,15 @@ export default function AdminPanel() {
   const handleStatusUpdate = async (id: string, newStatus: string) => {
     try {
       await api.updateSubmission(id, { status: newStatus });
-      fetchSubmissions();
+      
+      // Update state directly instead of refetching
+      setSubmissions(prev => prev.map(sub => 
+        sub.id === id ? { ...sub, status: newStatus } : sub
+      ));
+      
+      // Optionally update stats in background without blocking UI
       fetchStats();
+      
       showToast(t("admin.statusUpdated", "Status updated"), "success");
     } catch (error) {
       console.error("Status update failed:", error);

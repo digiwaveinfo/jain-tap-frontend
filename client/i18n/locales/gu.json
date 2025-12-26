@@ -87,7 +87,8 @@
       "schoolRequired": "આયંબિલ શાળા નામ જરૂરી છે",
       "cityRequired": "શહેર જરૂરી છે",
       "dateRequired": "કૃપા કરીને ઓછામાં ઓછી એક તારીખ પસંદ કરો"
-    }
+    },
+    "remaining": "બાકી"
   },
   "availableDates": {
     "title": "ઉપલબ્ધ તારીખો જુઓ",

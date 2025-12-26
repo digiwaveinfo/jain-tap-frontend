@@ -68,6 +68,17 @@ class ApiService {
     const data = await response.json();
 
     if (!response.ok) {
+      // Handle authentication errors - 401 Unauthorized or 403 Forbidden
+      if (response.status === 401 || response.status === 403) {
+        // Clear auth data
+        this.logout();
+        // Redirect to login page
+        if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+          window.location.href = '/admin/login';
+        }
+        throw new Error(data.message || 'Authentication required');
+      }
+      
       // Handle validation errors - extract first error message
       if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
         throw new Error(data.errors[0].message || data.message || 'Validation failed');

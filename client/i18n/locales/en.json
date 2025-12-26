@@ -87,7 +87,8 @@
       "schoolRequired": "Ayambil Shala name is required",
       "cityRequired": "City is required",
       "dateRequired": "Please select at least one date"
-    }
+    },
+    "remaining": "left"
   },
   "availableDates": {
     "title": "View Available Dates",
