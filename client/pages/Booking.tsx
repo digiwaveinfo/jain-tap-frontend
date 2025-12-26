@@ -564,8 +564,10 @@ export default function Booking() {
                             title={title}
                           >
                             <span className="font-semibold">{String(day).padStart(2, '0')}</span>
-                            {open && !full && !past && remaining < maxBookingsPerDay && (
-                              <span className="text-[9px] leading-none">{remaining} {t("booking.remaining")}</span>
+                            {open && !past && (
+                              <span className="text-[9px] leading-none">
+                                {full ? t("availableDates.fullyBooked") : `${remaining} ${t("booking.remaining")}`}
+                              </span>
                             )}
                           </button>
                         )
