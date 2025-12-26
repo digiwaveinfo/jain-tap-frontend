@@ -50,13 +50,13 @@ export default function TappNiVidhi() {
           </div>
 
           {/* Item 4 */}
-          <div className="flex gap-3 lg:gap-4">
+          <div className="flex gap-2 lg:gap-4">
             <span className="font-bold font-['Roboto'] flex-shrink-0">4)</span>
-            <div className="space-y-4">
+            <div className="space-y-4 min-w-0 flex-1">
               <p className="font-bold">{t("tapVidhi.item4Title")}</p>
               
-              <div className="pl-4 lg:pl-6">
-                <p className="font-normal">
+              <div className="pl-0 sm:pl-4 lg:pl-6 -ml-1 sm:ml-0">
+                <p className="font-normal text-[13px] sm:text-base lg:text-2xl whitespace-nowrap leading-tight">
                   {t("tapVidhi.item4Mantra")} <span className="font-bold">{t("tapVidhi.item4MantraBold")}</span>
                 </p>
               </div>

@@ -60,6 +60,8 @@ export default function Booking() {
   // New state for dynamic data
   const [openDates, setOpenDates] = useState<string[]>([]); // Dates explicitly opened by admin (YYYY-MM-DD)
   const [fullDates, setFullDates] = useState<string[]>([]); // Dates fully booked (YYYY-MM-DD)
+  const [bookingCounts, setBookingCounts] = useState<Record<string, number>>({}); // Booking counts per date
+  const [maxBookingsPerDay, setMaxBookingsPerDay] = useState(3); // Max bookings allowed per day
   const [loadingCalendar, setLoadingCalendar] = useState(false);
 
   // Fetch calendar data when month/year changes
@@ -100,6 +102,9 @@ export default function Booking() {
         const data = countsRes as any;
         const counts = data.bookingCounts || {};
         const max = data.maxBookingsPerDay || 3;
+
+        setBookingCounts(counts);
+        setMaxBookingsPerDay(max);
 
         const fulls = Object.keys(counts).filter(date => counts[date] >= max);
         setFullDates(fulls);
@@ -159,6 +164,12 @@ export default function Booking() {
   }
 
   const isSelected = (day: number) => selectedDates.includes(formatDate(day));
+
+  const getRemainingCount = (day: number) => {
+    const dateStr = convertToIsoFromParts(day, selectedMonth, selectedYear);
+    const booked = bookingCounts[dateStr] || 0;
+    return maxBookingsPerDay - booked;
+  };
 
   const convertToIsoFromParts = (d: number, m: number, y: number) => {
     return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -518,6 +529,7 @@ export default function Booking() {
                         const open = isOpen(day);
                         const full = isFull(day);
                         const selected = isSelected(day);
+                        const remaining = getRemainingCount(day);
                         const past = new Date(selectedYear, selectedMonth, day) < new Date(new Date().setHours(0, 0, 0, 0));
 
                         let btnClass = "bg-amber-50 border border-gray-100 text-amber-400 cursor-not-allowed"; // Default disabled/coming soon
@@ -535,7 +547,7 @@ export default function Booking() {
                             title = "Fully Booked";
                           } else {
                             btnClass = "bg-green-50 border border-green-500 text-green-700 hover:bg-green-100 cursor-pointer";
-                            title = "Available";
+                            title = `Available - ${remaining} remaining`;
                           }
                         }
 
@@ -546,12 +558,15 @@ export default function Booking() {
                             onClick={() => handleDateSelect(day)}
                             disabled={!open || full || (selectedDates.length >= maxDates && !selected)}
                             className={cn(
-                              "h-10 rounded text-sm font-['Roboto'] transition-colors flex items-center justify-center",
+                              "h-12 rounded text-xs font-['Roboto'] transition-colors flex flex-col items-center justify-center relative",
                               btnClass
                             )}
                             title={title}
                           >
-                            {String(day).padStart(2, '0')}
+                            <span className="font-semibold">{String(day).padStart(2, '0')}</span>
+                            {open && !full && !past && remaining < maxBookingsPerDay && (
+                              <span className="text-[9px] leading-none">{remaining} left</span>
+                            )}
                           </button>
                         )
                       })}
