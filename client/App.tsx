@@ -1,7 +1,7 @@
 import "./global.css";
 import "./i18n";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import TappNiVidhi from "./pages/TappNiVidhi";
 import Booking from "./pages/Booking";
@@ -20,7 +21,14 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 // Component to handle language changes on document
 function LanguageHandler() {
@@ -35,31 +43,40 @@ function LanguageHandler() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <LanguageHandler />
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tapp-ni-vidhi" element={<TappNiVidhi />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/available-dates" element={<AvailableDates />} />
-          <Route path="/anumodana" element={<Anumodana />} />
-          <Route path="/vidhinav" element={<Vidhinav />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminPanel />
-            </ProtectedRoute>
-          } />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <LanguageHandler />
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/tapp-ni-vidhi" element={<TappNiVidhi />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/available-dates" element={<AvailableDates />} />
+              <Route path="/anumodana" element={<Anumodana />} />
+              <Route path="/vidhinav" element={<Vidhinav />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminPanel />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  </React.StrictMode>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Safe root element check (Issue #16 fix)
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found. Make sure there is a <div id='root'></div> in your HTML.");
+}
+
+createRoot(rootElement).render(<App />);

@@ -1,4 +1,13 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+/**
+ * API Service Layer
+ * Handles all API communication with the backend
+ */
+
+// API Base URL - defaults to localhost for development
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Request timeout in milliseconds (Issue #9 fix)
+const REQUEST_TIMEOUT = 30000;
 
 interface ApiResponse<T = unknown> {
   success: boolean;
@@ -14,7 +23,7 @@ interface SubmissionData {
   whatsappNumber: string;
   ayambilShalaName: string;
   city: string;
-  bookingDate: string; // ISO format date
+  bookingDate: string;
   email?: string;
 }
 
@@ -28,7 +37,7 @@ interface Submission {
   bookingDate: string;
   status: string;
   submissionDate: string;
-  createdAt: string; // alias for submissionDate
+  createdAt: string;
   ipAddress?: string;
 }
 
@@ -45,71 +54,101 @@ interface PaginatedResponse<T> {
 
 class ApiService {
   private getAuthHeader(): HeadersInit {
-    const token = localStorage.getItem('adminToken');
+    const token = this.getToken();
     return token ? { 'Authorization': `Bearer ${token}` } : {};
   }
 
+  // Safe token retrieval
+  private getToken(): string | null {
+    try {
+      return sessionStorage.getItem('adminToken');
+    } catch {
+      return null;
+    }
+  }
+
+  // Request with timeout (Issue #9 fix)
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${BASE_URL}${endpoint}`;
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...this.getAuthHeader(),
       ...options.headers,
     };
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-    const data = await response.json();
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      // Handle authentication errors - 401 Unauthorized or 403 Forbidden
-      if (response.status === 401 || response.status === 403) {
-        // Clear auth data
-        this.logout();
-        // Redirect to login page
-        if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
-          window.location.href = '/admin/login';
+      clearTimeout(timeoutId);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle authentication errors
+        if (response.status === 401 || response.status === 403) {
+          this.logout();
+          if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
+            window.location.href = '/admin/login';
+          }
+          throw new Error(data.message || 'Authentication required');
         }
-        throw new Error(data.message || 'Authentication required');
+        
+        // Handle validation errors
+        if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+          throw new Error(data.errors[0].message || data.message || 'Validation failed');
+        }
+        throw new Error(data.message || 'API request failed');
       }
-      
-      // Handle validation errors - extract first error message
-      if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-        throw new Error(data.errors[0].message || data.message || 'Validation failed');
-      }
-      throw new Error(data.message || 'API request failed');
-    }
 
-    return data;
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timeout - please try again');
+      }
+      throw error;
+    }
   }
 
   // Public endpoints
   async submitBooking(data: SubmissionData): Promise<ApiResponse & { errors?: Array<{ field: string; message: string }> }> {
-    const url = `${API_BASE_URL}/submissions`;
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch(`${BASE_URL}/submissions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        signal: controller.signal,
+      });
 
-    const responseData = await response.json();
+      clearTimeout(timeoutId);
+      const responseData = await response.json();
 
-    if (!response.ok) {
-      // Return the full response including errors array for field-level validation
+      if (!response.ok) {
+        return responseData;
+      }
+
       return responseData;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        return { success: false, message: 'Request timeout - please try again' };
+      }
+      throw error;
     }
-
-    return responseData;
   }
 
   async getBookingCounts(startDate: string, endDate: string): Promise<ApiResponse<Record<string, number>>> {
@@ -127,26 +166,62 @@ class ApiService {
       body: JSON.stringify({ username, password }),
     });
 
-    if (response.success && response.token) {
-      localStorage.setItem('adminToken', response.token);
-      localStorage.setItem('adminUser', JSON.stringify(response.user));
+    if (response.success && response.data) {
+      try {
+        const { token, user } = response.data as { token: string; user: { username: string; role: string } };
+        if (token) {
+          sessionStorage.setItem('adminToken', token);
+          sessionStorage.setItem('adminUser', JSON.stringify(user));
+        }
+      } catch {
+        // Storage might be full or disabled
+      }
     }
 
     return response;
   }
 
   logout(): void {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
+    try {
+      sessionStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminUser');
+    } catch {
+      // Ignore storage errors
+    }
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('adminToken');
+    const token = this.getToken();
+    if (!token) return false;
+    
+    // Basic JWT expiry check (Issue #3 enhancement)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        this.logout();
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 
+  // Safe JSON parse (Issue #4 fix)
   getUser(): { username: string; role: string } | null {
-    const user = localStorage.getItem('adminUser');
-    return user ? JSON.parse(user) : null;
+    try {
+      const user = sessionStorage.getItem('adminUser');
+      if (!user) return null;
+      return JSON.parse(user);
+    } catch {
+      // Corrupted data - clear it
+      try {
+        sessionStorage.removeItem('adminUser');
+      } catch {
+        // Ignore
+      }
+      return null;
+    }
   }
 
   // Admin protected endpoints
@@ -193,13 +268,23 @@ class ApiService {
       });
     }
 
-    const token = localStorage.getItem('adminToken');
-    const response = await fetch(`${API_BASE_URL}/submissions/export?${params}`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const token = this.getToken();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s for export
 
-    if (!response.ok) throw new Error('Export failed');
-    return response.blob();
+    try {
+      const response = await fetch(`${BASE_URL}/submissions/export?${params}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error('Export failed');
+      return response.blob();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 
   async getHealth(): Promise<ApiResponse> {
@@ -232,19 +317,28 @@ class ApiService {
   }
 
   async uploadAnumodanaImage(formData: FormData): Promise<ApiResponse> {
-    // Need special handling for FormData (no Content-Type header, browser sets it)
-    const url = `${API_BASE_URL}/anumodana`;
-    const headers = this.getAuthHeader(); // Only auth, no content-type
+    const url = `${BASE_URL}/anumodana`;
+    const headers = this.getAuthHeader();
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: headers as HeadersInit,
-      body: formData
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s for upload
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Upload failed');
-    return data;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers as HeadersInit,
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Upload failed');
+      return data;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 
   async deleteAnumodanaImage(id: string): Promise<ApiResponse> {
@@ -265,4 +359,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
-export type { SubmissionData, Submission, PaginatedResponse };
+export type { SubmissionData, Submission, PaginatedResponse, ApiResponse };

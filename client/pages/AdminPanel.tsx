@@ -50,6 +50,15 @@ export default function AdminPanel() {
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+  
+  // Date range filter states
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [isFiltered, setIsFiltered] = useState(false);
+
+  // Track if we need to refetch due to filter changes
+  const [filterTrigger, setFilterTrigger] = useState(0);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -66,12 +75,24 @@ export default function AdminPanel() {
     }
     fetchSubmissions();
     fetchStats();
-  }, [page]);
+  }, [page, filterTrigger]);
 
   const fetchSubmissions = async () => {
     setLoading(true);
     try {
-      const response = await api.getSubmissions(page, 20);
+      const filters: Record<string, string> = {};
+      if (statusFilter) filters.status = statusFilter;
+      
+      // If only startDate is provided, use it as both start and end (single date filter)
+      if (startDate && !endDate) {
+        filters.startDate = startDate;
+        filters.endDate = startDate;
+      } else {
+        if (startDate) filters.startDate = startDate;
+        if (endDate) filters.endDate = endDate;
+      }
+      
+      const response = await api.getSubmissions(page, 50, Object.keys(filters).length > 0 ? filters : undefined);
       if (response.success) {
         setSubmissions(response.data);
         setTotalPages(response.pagination.totalPages);
@@ -79,9 +100,7 @@ export default function AdminPanel() {
       }
     } catch (error) {
       console.error("Failed to fetch submissions:", error);
-      // Auth errors are handled in api.request, will redirect automatically
       if (error instanceof Error && error.message.includes('Authentication')) {
-        // Already redirected by api service
         return;
       }
       showToast(t("admin.loadingFailed", "Failed to load data"), "error");
@@ -124,7 +143,20 @@ export default function AdminPanel() {
 
   const handleExport = async () => {
     try {
-      const blob = await api.exportSubmissions();
+      // Export with current filters (all matching records, not just current page)
+      const filters: Record<string, string> = {};
+      if (statusFilter) filters.status = statusFilter;
+      
+      // If only startDate is provided, use it as both start and end (single date filter)
+      if (startDate && !endDate) {
+        filters.startDate = startDate;
+        filters.endDate = startDate;
+      } else {
+        if (startDate) filters.startDate = startDate;
+        if (endDate) filters.endDate = endDate;
+      }
+      
+      const blob = await api.exportSubmissions(Object.keys(filters).length > 0 ? filters : undefined);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -136,6 +168,21 @@ export default function AdminPanel() {
       console.error("Export failed:", error);
       showToast(t("admin.exportFailed", "Export failed"), "error");
     }
+  };
+
+  const applyDateFilter = () => {
+    setPage(1);
+    setIsFiltered(startDate !== "" || endDate !== "" || statusFilter !== "");
+    setFilterTrigger(prev => prev + 1); // Trigger refetch
+  };
+
+  const clearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setStatusFilter("");
+    setIsFiltered(false);
+    setPage(1);
+    setFilterTrigger(prev => prev + 1); // Trigger refetch
   };
 
   const handleDelete = async (id: string) => {
@@ -377,7 +424,8 @@ export default function AdminPanel() {
             )}
 
             {/* Actions Bar */}
-            <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6 space-y-3">
+              {/* Search Row */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
                 <div className="flex gap-2 flex-1 min-w-0">
                   <Input
@@ -403,6 +451,57 @@ export default function AdminPanel() {
                   </Button>
                 </div>
               </div>
+              
+              {/* Filter Row */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center pt-2 border-t">
+                <div className="flex flex-wrap gap-2 items-center">
+                  <label className="text-sm font-body text-amber-600 whitespace-nowrap">{t("admin.dateFilter", "Date")}:</label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-36 text-sm"
+                    placeholder="From"
+                  />
+                  <span className="text-amber-400 text-sm">to</span>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-36 text-sm"
+                    placeholder="To (optional)"
+                  />
+                  <span className="text-xs text-amber-400 font-body">(leave 'to' empty for single date)</span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <label className="text-sm font-body text-amber-600 whitespace-nowrap">{t("admin.status", "Status")}:</label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="border rounded px-2 py-1.5 text-sm font-body min-w-[120px]"
+                  >
+                    <option value="">{t("admin.allStatus", "All")}</option>
+                    <option value="pending">{t("admin.pending", "Pending")}</option>
+                    <option value="confirmed">{t("admin.confirmed", "Confirmed")}</option>
+                    <option value="rejected">{t("admin.rejected", "Rejected")}</option>
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={applyDateFilter} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    {t("admin.applyFilter", "Apply Filter")}
+                  </Button>
+                  {(startDate || endDate || statusFilter) && (
+                    <Button onClick={clearFilters} size="sm" variant="outline" className="text-red-600 border-red-300">
+                      {t("admin.clearFilter", "Clear")}
+                    </Button>
+                  )}
+                </div>
+                {isFiltered && (
+                  <span className="text-xs text-green-600 font-body font-medium">
+                    ✓ {t("admin.filteredResults", "Filtered")}: {total} {t("admin.records", "records")}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Mobile Cards View */}
@@ -419,7 +518,7 @@ export default function AdminPanel() {
                 submissions.map((sub, idx) => (
                   <div key={sub.id} className="bg-white rounded-lg shadow p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <span className="font-body text-xs text-amber-500">#{(page - 1) * 20 + idx + 1}</span>
+                      <span className="font-body text-xs text-amber-500">#{(page - 1) * 50 + idx + 1}</span>
                       <div className="flex items-center gap-1">
                         <span className={`px-2 py-0.5 rounded text-xs font-body ${sub.status === "confirmed" ? "bg-green-100 text-green-700" :
                           sub.status === "rejected" ? "bg-red-100 text-red-700" :
@@ -506,7 +605,7 @@ export default function AdminPanel() {
                     ) : (
                       submissions.map((sub, idx) => (
                         <tr key={sub.id} className="border-t hover:bg-amber-50">
-                          <td className="px-2 py-2 font-body text-xs lg:text-sm">{(page - 1) * 20 + idx + 1}</td>
+                          <td className="px-2 py-2 font-body text-xs lg:text-sm">{(page - 1) * 50 + idx + 1}</td>
                           <td className="px-2 py-2 font-body text-xs lg:text-sm">{formatDate(sub.submissionDate || sub.createdAt)}</td>
                           <td className="px-2 py-2 font-body text-xs lg:text-sm">{formatDate(sub.bookingDate)}</td>
                           <td className="px-2 py-2 font-body text-xs lg:text-sm font-medium max-w-[100px] truncate">{sub.name}</td>
@@ -566,44 +665,12 @@ export default function AdminPanel() {
                 </table>
               </div>
 
-              {/* Pagination - only show when more than 1 page */}
-              {totalPages > 1 && (
-                <div className="px-3 py-2 border-t flex justify-between items-center">
-                  <p className="font-body text-xs lg:text-sm text-amber-600">
-                    {t("admin.showing", "Showing")} {submissions.length} {t("admin.of", "of")} {total}
-                  </p>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page === 1}
-                      onClick={() => setPage(p => p - 1)}
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    <span className="px-2 py-1 font-body text-xs lg:text-sm">
-                      {page} / {totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page === totalPages}
-                      onClick={() => setPage(p => p + 1)}
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Pagination - only show when more than 1 page */}
-            {totalPages > 1 && (
-              <div className="block sm:hidden mt-4 bg-white rounded-lg shadow p-3 flex justify-between items-center">
-                <p className="font-body text-xs text-amber-600">
-                  {submissions.length} / {total}
+              {/* Pagination - always show */}
+              <div className="px-3 py-2 border-t flex justify-between items-center">
+                <p className="font-body text-xs lg:text-sm text-amber-600">
+                  {t("admin.showing", "Showing")} {(page - 1) * 50 + 1}-{Math.min(page * 50, total)} {t("admin.of", "of")} {total}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-1 items-center">
                   <Button
                     variant="outline"
                     size="sm"
@@ -612,20 +679,48 @@ export default function AdminPanel() {
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <span className="px-2 py-1 font-body text-sm">
-                    {page}/{totalPages}
+                  <span className="px-3 py-1 font-body text-xs lg:text-sm bg-amber-50 rounded">
+                    {t("admin.page", "Page")} {page} / {totalPages || 1}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={page === totalPages}
+                    disabled={page >= totalPages}
                     onClick={() => setPage(p => p + 1)}
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
-            )}
+            </div>
+
+            {/* Mobile Pagination - always show */}
+            <div className="block sm:hidden mt-4 bg-white rounded-lg shadow p-3 flex justify-between items-center">
+              <p className="font-body text-xs text-amber-600">
+                {(page - 1) * 50 + 1}-{Math.min(page * 50, total)} / {total}
+              </p>
+              <div className="flex gap-2 items-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 1}
+                  onClick={() => setPage(p => p - 1)}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="px-2 py-1 font-body text-sm bg-amber-50 rounded">
+                  {page}/{totalPages || 1}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </main>

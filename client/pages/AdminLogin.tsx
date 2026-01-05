@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,13 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (api.isAuthenticated()) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -23,13 +30,14 @@ export default function AdminLogin() {
     try {
       const response = await api.login(username, password);
       if (response.success) {
-        navigate("/admin");
+        // Use hard redirect to ensure ProtectedRoute re-checks auth
+        window.location.href = "/admin";
       } else {
         setError(response.message || "Login failed");
+        setLoading(false);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
-    } finally {
       setLoading(false);
     }
   };
