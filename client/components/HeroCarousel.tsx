@@ -63,7 +63,8 @@ export default function HeroCarousel() {
             <img
               src={slide.mobileImage}
               alt={`Slide ${index + 1}`}
-              className="sm:hidden w-full h-full object-cover"
+              className="sm:hidden w-full h-full object-fill"
+              style={{ transform: 'rotate(-90deg) scale(1.5)', transformOrigin: 'center center' }}
             />
           </div>
         ))}
@@ -86,8 +87,8 @@ export default function HeroCarousel() {
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={`w-2 h-2 lg:w-3 lg:h-3 rounded-full transition-all ${index === currentSlide
-                    ? "bg-white w-6 lg:w-8"
-                    : "bg-white/50 hover:bg-white/70"
+                  ? "bg-white w-6 lg:w-8"
+                  : "bg-white/50 hover:bg-white/70"
                   }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
