@@ -4,7 +4,7 @@
  */
 
 // API Base URL - defaults to localhost for development
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // Request timeout in milliseconds (Issue #9 fix)
 const REQUEST_TIMEOUT = 30000;
@@ -103,7 +103,7 @@ class ApiService {
           }
           throw new Error(data.message || 'Authentication required');
         }
-        
+
         // Handle validation errors
         if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
           throw new Error(data.errors[0].message || data.message || 'Validation failed');
@@ -193,7 +193,7 @@ class ApiService {
   isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;
-    
+
     // Basic JWT expiry check (Issue #3 enhancement)
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
