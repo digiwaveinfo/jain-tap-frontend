@@ -14,16 +14,28 @@ export default function HeroCarousel() {
       description: t("carousel.slide1Desc"),
     },
     {
-      desktopImage: "/home.png",
-      mobileImage: "/home-mobile-view.png",
+      desktopImage: "/home-carosole1.jpeg",
+      mobileImage: "/home-carosole1.jpeg",
       quote: t("carousel.slide2Quote"),
       description: t("carousel.slide2Desc"),
     },
     {
-      desktopImage: "/home.png",
-      mobileImage: "/home-mobile-view.png",
+      desktopImage: "/home-carosole2.jpeg",
+      mobileImage: "/home-carosole2.jpeg",
       quote: t("carousel.slide3Quote"),
       description: t("carousel.slide3Desc"),
+    },
+    {
+      desktopImage: "/home-carosole3.jpeg",
+      mobileImage: "/home-carosole3.jpeg",
+      quote: t("carousel.slide4Quote"),
+      description: t("carousel.slide4Desc"),
+    },
+    {
+      desktopImage: "/home-carosole4.jpeg",
+      mobileImage: "/home-carosole4.jpeg",
+      quote: t("carousel.slide5Quote"),
+      description: t("carousel.slide5Desc"),
     },
   ];
 
@@ -58,13 +70,13 @@ export default function HeroCarousel() {
             <img
               src={slide.desktopImage}
               alt={`Slide ${index + 1}`}
-              className="hidden sm:block w-full h-full object-cover"
+              className="hidden sm:block w-full h-full object-fill"
             />
             <img
               src={slide.mobileImage}
               alt={`Slide ${index + 1}`}
               className="sm:hidden w-full h-full object-fill"
-              style={{ transform: 'rotate(-90deg) scale(1.5)', transformOrigin: 'center center' }}
+              style={index === 0 ? { transform: 'rotate(-90deg) scale(1.5)', transformOrigin: 'center center' } : undefined}
             />
           </div>
         ))}

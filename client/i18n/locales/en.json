@@ -123,10 +123,14 @@
   "carousel": {
     "slide1Quote": "The pure purpose of the tap is clear in its name itself.",
     "slide1Desc": "The revered ones who travel from village to village bring welfare to the souls of many beings.",
-    "slide2Quote": "When monks and nuns are traveling, all these aradhanas happen.",
-    "slide2Desc": "The day travel stops, everything stops. This is understandable.",
-    "slide3Quote": "We need to accumulate such merit through tap-aradhana.",
-    "slide3Desc": "That such accidents never happen."
+    "slide2Quote": "Safety of Monks and Nuns, Our Tap Our Goal!",
+    "slide2Desc": "",
+    "slide3Quote": "Join Vihar Raksha Tap, Earn Merit!",
+    "slide3Desc": "",
+    "slide4Quote": "Vihar Safe through Tap, Soul Pure!",
+    "slide4Desc": "",
+    "slide5Quote": "Strength in the Sangh, Vihar Safety Guaranteed!",
+    "slide5Desc": ""
   },
   "calendar": {
     "months": [
@@ -159,7 +163,7 @@
     "back": "Back"
   },
   "footer": {
-    "greeting": "Jai Jinendra"
+    "greeting": "Monk Safety, Our Goal! Vihar Safe through Tap, Soul Pure!"
   },
   "admin": {
     "loginTitle": "Admin Login",
